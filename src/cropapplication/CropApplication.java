@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
-
 /**
  *
  * @author HossamEldeen
@@ -30,28 +29,35 @@ public class CropApplication {
     public static void main(String[] args) {
         File dir = new File("C:\\Data\\Screenshots\\new");
         File[] files = dir.listFiles();
-        for(File file: files){
-            Image  img = new ImageIcon(file.getAbsolutePath()).getImage();
-            BufferedImage bufferedImage = new BufferedImage(img.getWidth(null), img.getHeight(null),
-            BufferedImage.TYPE_INT_RGB);
-
-            Graphics g = bufferedImage.createGraphics();
-            g.drawImage(img, 0, 0, null);
-            g.dispose();
-
-            BufferedImage bufimg = cropImage(bufferedImage);
-            
+        for (File file : files) {
+            BufferedImage bufferedImage = convertFileToBufferedImage(file);
+            BufferedImage bufimg = cropImage(bufferedImage, 0, 107, 2559, 1355);
             file.delete();
-            try {
-                ImageIO.write(bufimg, "png", new File(file.getAbsolutePath()));
-            } catch (IOException ex) {
-                Logger.getLogger(CropApplication.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            saveFile(bufimg, "png", file.getAbsolutePath());
         }
     }
-    
-    private static BufferedImage cropImage(BufferedImage src) {
-      BufferedImage dest = src.getSubimage(0, 107, 2559, 1355);
-      return dest; 
-   }
+
+    private static BufferedImage convertFileToBufferedImage(File file) {
+        Image img = new ImageIcon(file.getAbsolutePath()).getImage();
+        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null), img.getHeight(null),
+                BufferedImage.TYPE_INT_RGB);
+
+        Graphics g = bufferedImage.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        return bufferedImage;
+    }
+
+    private static void saveFile(BufferedImage bufImg, String ext, String path) {
+        try {
+            ImageIO.write(bufImg, ext, new File(path));
+        } catch (IOException ex) {
+            Logger.getLogger(CropApplication.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private static BufferedImage cropImage(BufferedImage src, int startX, int startY, int width, int height) {
+        BufferedImage dest = src.getSubimage(startX, startY, width, height);
+        return dest;
+    }
 }
